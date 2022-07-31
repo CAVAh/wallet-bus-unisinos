@@ -26,8 +26,10 @@ function App() {
       // Find user login info
       api.getUserByCPF(user.cpf)
         .then((userInfo) => {
-          console.log('data updated!');
-          setUser(userInfo);
+          if (userInfo) {
+            console.log('data updated!');
+            setUser(userInfo);
+          }
         })
         .catch((err) => {
           console.log(err);
@@ -40,7 +42,7 @@ function App() {
     //Prevent page reload
     event.preventDefault();
 
-    var { uname, pass } = document.forms[0];
+    var { uname/*, pass*/ } = document.forms[0];
     
     // Find user login info
     try {
@@ -58,6 +60,9 @@ function App() {
         } else {*/
         setIsSubmitted(true);
         /*}*/
+      } else {
+        // Invalid user
+        setErrorMessages({ name: "uname", message: errors.uname });
       }
     } catch (err) {
       setErrorMessages({ name: "uname", message: errors.uname });

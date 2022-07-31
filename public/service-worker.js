@@ -2,7 +2,7 @@
 
 // CACHE stands for storage of the browser
 const CACHE_NAME = "v1"
-const urlsToCache = ["index.html", "offline.html"]
+const urlsToCache = ["index.html"]
 
 const self = this
 

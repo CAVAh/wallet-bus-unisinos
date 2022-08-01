@@ -15,8 +15,8 @@ const getAllUsers = () => {
     });
 };
 
-const getUserByCPF = (cpf) => {
-  return fetch(`${URL}/${cpf}`, params)
+const getUserByDocument = (document) => {
+  return fetch(`${URL}/${document}`, params)
     .then((res) => res.json())
     .catch((err) => {
       console.error('Ocorreu um erro', err);
@@ -25,7 +25,7 @@ const getUserByCPF = (cpf) => {
 
 const api = {
   getAllUsers,
-  getUserByCPF,
+  getUserByDocument,
 };
 
 export default api;

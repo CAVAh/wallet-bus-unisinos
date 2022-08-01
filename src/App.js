@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import moment from 'moment';
 import 'moment/locale/pt-br';
 import api from './api';
+import defaultAvatar from './default-avatar.jpg';
 
 import "./App.css";
 
@@ -11,6 +12,8 @@ function App() {
   const [isSubmitted, setIsSubmitted] = useState(!!localStorage.getItem('user'));
   const [user, setUser] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
   const [currentWeek, setCurrentWeek] = useState(null);
+  const initWeek = 31;
+  const endWeek = 48;
 
   const errors = {
     uname: "Usuário inválido",
@@ -24,7 +27,7 @@ function App() {
 
     if (window.navigator.onLine && user) {
       // Find user login info
-      api.getUserByCPF(user.cpf)
+      api.getUserByDocument(user.document)
         .then((userInfo) => {
           if (userInfo) {
             console.log('data updated!');
@@ -46,9 +49,7 @@ function App() {
     
     // Find user login info
     try {
-      const userData = await api.getUserByCPF(uname.value);
-
-      console.log(userData);
+      const userData = await api.getUserByDocument(uname.value);
 
       // Compare user info
       if (userData) {
@@ -69,6 +70,10 @@ function App() {
     }
   };
 
+  const handleLogout = () => {
+    setIsSubmitted(false);
+  }
+
   // Generate JSX code for error message
   const renderErrorMessage = (name) =>
     name === errorMessages.name && (
@@ -82,7 +87,7 @@ function App() {
       <div className="form">
         <form onSubmit={handleSubmit}>
           <div className="input-container">
-            <label>CPF </label>
+            <label>RG </label>
             <input type="text" name="uname" required />
             {renderErrorMessage("uname")}
           </div>
@@ -99,19 +104,43 @@ function App() {
     </>
   );
 
+  const hasTrip = (currentWeek) => {
+    if (initWeek <= currentWeek && currentWeek <= endWeek) {
+      if (user.trips.length > 1) {
+        return user.trips[currentWeek]
+      }
+
+      if (user.trips.length === 1) {
+        return user.trips[0]
+      }
+    }
+    
+    return null;
+  }
+
+  const tryRequireImage = (document) => {
+    try {
+      return require(`./images/${document}.jpeg`);
+    } catch (err) {
+      return null;
+    }
+  };
+
   return (
     <div className="app">
       <div className="login-form">
-        
         {isSubmitted ?
           <>
+            <div className="float-right" onClick={handleLogout}>
+              <span className="times">×</span>
+            </div>
             <div>
               <table className="wallet-info">
                 <tbody>
                   <tr>
                     <td rowSpan="3">
                       <img
-                        src="https://www.gravatar.com/avatar/205e460b479e2e5b48aec07710c08d50?s=200"
+                        src={tryRequireImage(user.document) ?? defaultAvatar}
                         className="avatar"
                         alt="avatar"
                       />
@@ -122,7 +151,7 @@ function App() {
                     <td><strong>Curso</strong><br />{ user.course }</td>
                   </tr>
                   <tr>
-                    <td><strong>Semana</strong><br />{ moment().isoWeek() }</td>
+                    <td><strong>Semana</strong><br />{ moment().isoWeek() - 30 }</td>
                   </tr>
                 </tbody>
               </table>
@@ -141,19 +170,19 @@ function App() {
                 <tbody>
                   <tr>
                     <td>Ida</td>
-                    <th>{ user.trips[currentWeek]?.monday.in ? 'x' : '' }</th>
-                    <th>{ user.trips[currentWeek]?.tuesday.in ? 'x' : '' }</th>
-                    <th>{ user.trips[currentWeek]?.wednesday.in ? 'x' : '' }</th>
-                    <th>{ user.trips[currentWeek]?.thurday.in ? 'x' : '' }</th>
-                    <th>{ user.trips[currentWeek]?.friday.in ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.monday.in ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.tuesday.in ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.wednesday.in ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.thurday.in ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.friday.in ? 'x' : '' }</th>
                   </tr>
                   <tr>
                     <td>Volta</td>
-                    <th>{ user.trips[currentWeek]?.monday.out ? 'x' : '' }</th>
-                    <th>{ user.trips[currentWeek]?.tuesday.out ? 'x' : '' }</th>
-                    <th>{ user.trips[currentWeek]?.wednesday.out ? 'x' : '' }</th>
-                    <th>{ user.trips[currentWeek]?.thurday.out ? 'x' : '' }</th>
-                    <th>{ user.trips[currentWeek]?.friday.out ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.monday.out ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.tuesday.out ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.wednesday.out ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.thurday.out ? 'x' : '' }</th>
+                    <th>{ hasTrip(currentWeek)?.friday.out ? 'x' : '' }</th>
                   </tr>
                 </tbody>
               </table>

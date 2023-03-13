@@ -12,8 +12,8 @@ function App() {
   const [isSubmitted, setIsSubmitted] = useState(!!localStorage.getItem('user'));
   const [user, setUser] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
   const [currentWeek, setCurrentWeek] = useState(null);
-  const initWeek = 31;
-  const endWeek = 48;
+  const initWeek = 9;
+  const endWeek = 26;
 
   const errors = {
     uname: "Usuário inválido",
@@ -27,18 +27,14 @@ function App() {
 
     if (window.navigator.onLine && user) {
       // Find user login info
-      api.getUserByDocument(user.document)
-        .then((userInfo) => {
-          if (userInfo) {
-            console.log('data updated!');
-            setUser(userInfo);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      const userInfo = api.getLocalUserByDocument(user.document);
+
+      if (userInfo) {
+        console.log('data updated!');
+        setUser(userInfo);
+      }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (event) => {
@@ -46,10 +42,10 @@ function App() {
     event.preventDefault();
 
     var { uname/*, pass*/ } = document.forms[0];
-    
+
     // Find user login info
     try {
-      const userData = await api.getUserByDocument(uname.value);
+      const userData = await api.getLocalUserByDocument(uname.value);
 
       // Compare user info
       if (userData) {
@@ -114,7 +110,7 @@ function App() {
         return user.trips[0]
       }
     }
-    
+
     return null;
   }
 
@@ -145,13 +141,13 @@ function App() {
                         alt="avatar"
                       />
                     </td>
-                    <td><strong>Nome</strong><br />{ user.name }</td>
+                    <td><strong>Nome</strong><br />{user.name}</td>
                   </tr>
                   <tr>
-                    <td><strong>Curso</strong><br />{ user.course }</td>
+                    <td><strong>Curso</strong><br />{user.course}</td>
                   </tr>
                   <tr>
-                    <td><strong>Semana</strong><br />{ moment().isoWeek() - 30 }</td>
+                    <td><strong>Semana</strong><br />{moment().isoWeek() - initWeek - 1}</td>
                   </tr>
                 </tbody>
               </table>
@@ -170,23 +166,24 @@ function App() {
                 <tbody>
                   <tr>
                     <td>Ida</td>
-                    <th>{ hasTrip(currentWeek)?.monday.in ? 'x' : '' }</th>
-                    <th>{ hasTrip(currentWeek)?.tuesday.in ? 'x' : '' }</th>
-                    <th>{ hasTrip(currentWeek)?.wednesday.in ? 'x' : '' }</th>
-                    <th>{ hasTrip(currentWeek)?.thurday.in ? 'x' : '' }</th>
-                    <th>{ hasTrip(currentWeek)?.friday.in ? 'x' : '' }</th>
+                    <th>{hasTrip(currentWeek)?.monday.in ? 'x' : ''}</th>
+                    <th>{hasTrip(currentWeek)?.tuesday.in ? 'x' : ''}</th>
+                    <th>{hasTrip(currentWeek)?.wednesday.in ? 'x' : ''}</th>
+                    <th>{hasTrip(currentWeek)?.thurday.in ? 'x' : ''}</th>
+                    <th>{hasTrip(currentWeek)?.friday.in ? 'x' : ''}</th>
                   </tr>
                   <tr>
                     <td>Volta</td>
-                    <th>{ hasTrip(currentWeek)?.monday.out ? 'x' : '' }</th>
-                    <th>{ hasTrip(currentWeek)?.tuesday.out ? 'x' : '' }</th>
-                    <th>{ hasTrip(currentWeek)?.wednesday.out ? 'x' : '' }</th>
-                    <th>{ hasTrip(currentWeek)?.thurday.out ? 'x' : '' }</th>
-                    <th>{ hasTrip(currentWeek)?.friday.out ? 'x' : '' }</th>
+                    <th>{hasTrip(currentWeek)?.monday.out ? 'x' : ''}</th>
+                    <th>{hasTrip(currentWeek)?.tuesday.out ? 'x' : ''}</th>
+                    <th>{hasTrip(currentWeek)?.wednesday.out ? 'x' : ''}</th>
+                    <th>{hasTrip(currentWeek)?.thurday.out ? 'x' : ''}</th>
+                    <th>{hasTrip(currentWeek)?.friday.out ? 'x' : ''}</th>
                   </tr>
                 </tbody>
               </table>
-            </div>            
+              <small>v2.0</small>
+            </div>
           </>
           : renderForm
         }

@@ -12,7 +12,7 @@ function App() {
   const [isSubmitted, setIsSubmitted] = useState(!!localStorage.getItem('user'));
   const [user, setUser] = useState(localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null);
   const [currentWeek, setCurrentWeek] = useState(null);
-  const initWeek = 8;
+  const initWeek = 9;
   const endWeek = 26;
 
   const errors = {

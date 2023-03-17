@@ -351,7 +351,7 @@ const database = {
           out: false,
         },
         tuesday: {
-          in: true,
+          in: false,
           out: false,
         },
         wednesday: {
